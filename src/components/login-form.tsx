@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // import { cn } from "@/lib/utils"
 // import { Button } from "@/components/ui/button"
 // import { Input } from "@/components/ui/input"
@@ -99,78 +101,40 @@ export function LoginForm() {
       password: "",
     },
   });
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    startTransition(async () => {
-      // * WORKS
-      try {
-        const res = await fetch("https://localhost/api/auth/login", {
-          method: "POST",
-          credentials: "include", // 🔥 ensures cookies are stored
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(values),
-        });
-        console.log({ res });
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const res = await fetch("https://localhost/api/auth/login", {
+        method: "POST",
+        credentials: "include", // 🔥 ensures cookies are stored
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
 
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.message || "Login failed");
-        }
-
-        toast({
-          title: "Login successful",
-          description: "Redirecting...",
-        });
-        // window.location.href = "/dashboard";
-
-        // router.push("/dashboard"); // if needed
-      } catch (error: any) {
-        toast({
-          title: "Login failed",
-          description: error.message || "Invalid credentials",
-          variant: "destructive",
-        });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Login failed");
       }
-    });
-    // try {
-    //   await login(values);
-    //   toast({
-    //     title: "Sign up successful",
-    //     description: "Sign in to your account",
-    //   });
-    //   console.log({ values });
-    //   // router.push("/dashboard");
-    // } catch (error: any) {
-    //   toast({
-    //     title: "Login failed",
-    //     description: error.message || "Invalid credentials",
-    //     variant: "destructive",
-    //   });
-    // }
-    // });
+
+      // await new Promise((resolve) => setTimeout(resolve, 100));
+
+      toast({
+        title: "Login successful",
+        description: "Redirecting...",
+      });
+      window.location.href = "/dashboard"; // ← full reload, new cookie is sent
+
+      // router.push("/dashboard"); // if needed
+    } catch (error: any) {
+      toast({
+        title: "Login failed",
+        description: error.message || "Invalid credentials",
+        variant: "destructive",
+      });
+    }
   }
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const res = await fetch("https://localhost/api/auth/login", {
-      method: "POST",
-      credentials: "include", // 🔥 must include this to receive cookies
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (res.ok) {
-      console.log("Login successful");
-    } else {
-      console.error("Login failed");
-    }
-  };
   return (
     <Form {...form}>
       <form

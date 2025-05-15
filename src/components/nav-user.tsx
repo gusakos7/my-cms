@@ -27,6 +27,7 @@ import {
 import { startTransition } from "react";
 import { logout } from "@/actions";
 import { useToast } from "@/hooks/use-toast";
+// import { useRouter } from "next/navigation";
 
 export function NavUser({
   user,
@@ -37,16 +38,27 @@ export function NavUser({
     avatar: string;
   };
 }) {
+  // const router = useRouter();
   const { toast } = useToast();
   const { isMobile } = useSidebar();
   const handleClick = () => {
     startTransition(async () => {
-      await logout();
-      toast({
-        title: "Logged out",
-        description: "You have been logged out successfully.",
-      });
-      window.location.href = "/login";
+      try {
+        await logout();
+        toast({
+          title: "Logged out",
+          description: "You have been logged out successfully.",
+        });
+        window.location.href = "/";
+        // router.push("/");
+      } catch (error) {
+        console.log({ error });
+        toast({
+          title: "Error",
+          description: "Logout failed, please try again",
+          variant: "destructive",
+        });
+      }
     });
   };
   return (
@@ -59,11 +71,14 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarImage src={user?.avatar} alt={user.name} />
+                <AvatarImage
+                  src={"https://github.com/shadcn.png"}
+                  alt={user.name}
+                />
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
+                <span className="truncate font-medium">{user.email}</span>
                 {/* <span className="truncate text-xs text-muted-foreground">
                   {user.email}
                 </span> */}

@@ -4,6 +4,24 @@
 import { cookies } from "next/headers";
 
 const BASE_URL = "https://localhost/api/auth";
+
+export async function getUsers() {
+  const accessToken = cookies().get("access_token")?.value;
+  const refreshToken = cookies().get("refresh_token")?.value;
+  const res = await fetch(`https://localhost/api/users`, {
+    method: "GET",
+    headers: {
+      Cookie: `access_token=${accessToken}; refresh_token=${refreshToken}`,
+    },
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    console.log({ error: data?.errors && data?.errors[0].msg });
+    return null;
+  }
+  return data;
+}
+
 export async function login({ email, password }: { email: string; password: string }) {
   const res = await fetch(`${BASE_URL}/login`, {
     method: "POST",
@@ -58,15 +76,19 @@ export async function register(
 }
 
 export const getSession = async () => {
-  const token = cookies().get("access_token")?.value;
+  const accessToken = cookies().get("access_token")?.value;
+  const refreshToken = cookies().get("refresh_token")?.value;
   const res = await fetch(`${BASE_URL}/session`, {
     method: 'GET',
     headers: {
-      Cookie: `access_token=${token}`,
+      Cookie: `access_token=${accessToken}; refresh_token=${refreshToken}`,
     },
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.errors[0].msg || 'Session expired');
+  if (!res.ok) {
+    console.log({ error: data.errors[0].msg });
+    return null;
+  }
   // if (!res.ok) throw new Error(data.errors[0].msg || 'Session expired');
   return data;
 }
@@ -83,4 +105,5 @@ export const logout = async () => {
   if (!res.ok) throw new Error('Logout failed');
   cookies().delete("access_token");
   cookies().delete("refresh_token");
+  // redirect("/")
 }

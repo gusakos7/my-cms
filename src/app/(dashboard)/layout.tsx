@@ -9,7 +9,7 @@ async function DashboardLayout({ children }: { children: React.ReactNode }) {
   console.log({ session });
   return (
     <SidebarProvider>
-      <AppSidebar variant="inset" />
+      <AppSidebar session={session} variant="inset" />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">

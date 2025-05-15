@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -31,9 +32,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { startTransition, useEffect, useState } from "react";
-import { getSession } from "@/actions";
-import { useToast } from "@/hooks/use-toast";
 
 const data = {
   user: {
@@ -152,32 +150,11 @@ const data = {
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { toast } = useToast();
-  const [session, setSession] = useState<any>({
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  });
-  useEffect(() => {
-    startTransition(async () => {
-      try {
-        const data = await getSession();
-        toast({
-          title: "Sign up successful",
-          description: "Sign in to your account",
-        });
-        setSession({ name: data.name, email: data.email });
-        // router.push("/dashboard");
-      } catch (error: any) {
-        toast({
-          title: "Login failed",
-          description: error.message || "Invalid credentials",
-          variant: "destructive",
-        });
-      }
-    });
-  }, []);
+export function AppSidebar({
+  session,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { session: any }) {
+  console.log({ session });
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>

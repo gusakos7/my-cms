@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { GalleryVerticalEnd } from "lucide-react";
 
 import { RegisterForm } from "@/components/register-form";
