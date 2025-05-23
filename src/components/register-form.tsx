@@ -19,6 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { startTransition } from "react";
 import { register } from "@/actions";
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 const formSchema = z.object({
   email: z.string().email().min(2, {
@@ -61,10 +62,11 @@ export function RegisterForm() {
           description: "Sign in to your account",
         });
         console.log({ values });
+        window.location.href = "/dashboard";
         // router.push("/dashboard");
       } catch (error: any) {
         toast({
-          title: "Login failed",
+          title: "Register failed",
           description: error.message || "Invalid credentials",
           variant: "destructive",
         });
@@ -78,9 +80,9 @@ export function RegisterForm() {
         className="flex flex-col gap-6"
       >
         <div className="flex flex-col items-center gap-2 text-center">
-          <h1 className="text-2xl font-bold">Login to your account</h1>
+          <h1 className="text-2xl font-bold">Register to the app</h1>
           <p className="text-balance text-sm text-muted-foreground">
-            Enter your email below to login to your account
+            Enter the information below to create an account
           </p>
         </div>
         <div className="grid gap-2">
@@ -105,7 +107,7 @@ export function RegisterForm() {
             name="lastName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>First name</FormLabel>
+                <FormLabel>Last name</FormLabel>
                 <FormControl>
                   <Input placeholder="Doe" type="text" {...field} />
                 </FormControl>
@@ -170,9 +172,9 @@ export function RegisterForm() {
         </div>
         <div className="text-center text-sm">
           Don&apos;t have an account?{" "}
-          <a href="#" className="underline underline-offset-4">
-            Sign up
-          </a>
+          <Link href="/login" className="underline underline-offset-4">
+            Sign in
+          </Link>
         </div>
       </form>
     </Form>

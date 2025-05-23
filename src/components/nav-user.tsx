@@ -28,38 +28,63 @@ import { startTransition } from "react";
 import { logout } from "@/actions";
 import { useToast } from "@/hooks/use-toast";
 // import { useRouter } from "next/navigation";
-
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}) {
-  // const router = useRouter();
+import { Session, useSession } from "@/contexts/session-context";
+import { useRouter } from "next/navigation";
+export function NavUser() {
+  // export function NavUser({
+  //   session,
+  // }: {
+  //   session: Session | null;
+  // }) {
+  const router = useRouter();
   const { toast } = useToast();
   const { isMobile } = useSidebar();
-  const handleClick = () => {
-    startTransition(async () => {
-      try {
-        await logout();
-        toast({
-          title: "Logged out",
-          description: "You have been logged out successfully.",
-        });
-        window.location.href = "/";
-        // router.push("/");
-      } catch (error) {
-        console.log({ error });
-        toast({
-          title: "Error",
-          description: "Logout failed, please try again",
-          variant: "destructive",
-        });
-      }
-    });
+  const { session, setSession } = useSession();
+  console.log({ session });
+  // const handleClick = () => {
+  //   startTransition(async () => {
+  //     try {
+  //       await logout();
+  //       toast({
+  //         title: "Logged out",
+  //         description: "You have been logged out successfully.",
+  //       });
+  //       window.location.href = "/";
+  //       // router.push("/");
+  //     } catch (error) {
+  //       console.log({ error });
+  //       toast({
+  //         title: "Error",
+  //         description: "Logout failed, please try again",
+  //         variant: "destructive",
+  //       });
+  //     }
+  //   });
+  // };
+  const handleClick = async () => {
+    try {
+      await fetch("https://localhost/api/auth/logout", {
+        method: "POST",
+        credentials: "include", // 🔥 ensures cookies are stored
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      toast({
+        title: "Logged out",
+        description: "You have been logged out successfully.",
+      });
+      setSession(null);
+      window.location.href = "/";
+      // router.push("/");
+    } catch (error) {
+      console.log({ error });
+      toast({
+        title: "Error",
+        description: "Logout failed, please try again",
+        variant: "destructive",
+      });
+    }
   };
   return (
     <SidebarMenu>
@@ -73,14 +98,14 @@ export function NavUser({
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarImage
                   src={"https://github.com/shadcn.png"}
-                  alt={user.name}
+                  alt={session?.firstName}
                 />
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.email}</span>
+                <span className="truncate font-medium">{session?.email}</span>
                 {/* <span className="truncate text-xs text-muted-foreground">
-                  {user.email}
+                  {session.email}
                 </span> */}
               </div>
               <MoreVerticalIcon className="ml-auto size-4" />
@@ -95,13 +120,15 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user?.avatar} alt={user.name} />
+                  <AvatarImage src={session?.avatar} alt={session?.firstName} />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
+                  <span className="truncate font-medium">
+                    {session?.firstName}
+                  </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {user.email}
+                    {session?.email}
                   </span>
                 </div>
               </div>

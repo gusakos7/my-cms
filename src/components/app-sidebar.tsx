@@ -32,6 +32,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+// import { useEffect, useState } from "react";
+import { useSession } from "@/contexts/session-context";
 
 const data = {
   user: {
@@ -151,10 +153,23 @@ const data = {
 };
 
 export function AppSidebar({
-  session,
+  // session,
   ...props
 }: React.ComponentProps<typeof Sidebar> & { session: any }) {
-  console.log({ session });
+  const { session } = useSession();
+  // const [user, setUser] = useState({ name: "", email: "", avatar: "" });
+  // const [loading, setLoading] = useState(true);
+  // useEffect(() => {
+  //   fetch("https://localhost/api/auth/session", { credentials: "include" })
+  //     .then((res) => (res.ok ? res.json() : null))
+  //     .then((data) => {
+  //       setUser(data);
+  //       setLoading(false);
+  //     });
+
+  //   // const sUser = await fetch("/api/auth/session",)
+  // }, []);
+  console.log({ sessionappsidebar: session });
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -178,7 +193,8 @@ export function AppSidebar({
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={session} />
+        <NavUser />
+        {/* {loading ? <p>Is loading</p> : <NavUser user={user} />} */}
       </SidebarFooter>
     </Sidebar>
   );

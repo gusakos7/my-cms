@@ -1,6 +1,8 @@
 "use server"
 
 
+import { User, UserResponse } from "@/types";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 const BASE_URL = "https://localhost/api/auth";
@@ -69,7 +71,8 @@ export async function register(
 
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.message || 'Registration failed');
+    console.dir({ err }, { depth: null })
+    throw new Error(err.errors && err.errors[0].message || 'Registration failed');
   }
 
   return res.json();
@@ -106,4 +109,107 @@ export const logout = async () => {
   cookies().delete("access_token");
   cookies().delete("refresh_token");
   // redirect("/")
+}
+
+
+export async function addUser(
+  { email, password, firstName, lastName, confirmPassword }: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    confirmPassword: string;
+  }) {
+  const res = await fetch(`${BASE_URL}/register`, {
+    method: 'POST',
+    body: JSON.stringify({ email, password, firstName, lastName, confirmPassword }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    console.dir({ err }, { depth: null })
+    throw new Error(err.errors && err.errors[0].message || 'Registration failed');
+  }
+
+  return res.json();
+}
+
+export async function updateUser(user: User): Promise<User> {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ""}${BASE_URL}/${user.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.message || `API error: ${response.status}`)
+    }
+
+    const data = (await response.json()) as UserResponse
+
+    if (!data.success || !data.data?.user) {
+      throw new Error(data.message || "Failed to update user")
+    }
+
+    revalidatePath("/admin/users")
+    return data.data.user
+  } catch (error) {
+    console.error("Failed to update user:", error)
+    throw error
+  }
+}
+
+export async function deleteUser(id: string): Promise<void> {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ""}${BASE_URL}/${id}`, {
+      method: "DELETE",
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.message || `API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    if (!data.success) {
+      throw new Error(data.message || "Failed to delete user")
+    }
+
+    revalidatePath("/admin/users")
+  } catch (error) {
+    console.error("Failed to delete user:", error)
+    throw error
+  }
+}
+
+export async function toggleUserStatus(id: string): Promise<void> {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ""}${BASE_URL}/${id}/toggle-status`, {
+      method: "PATCH",
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.message || `API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    if (!data.success) {
+      throw new Error(data.message || "Failed to toggle user status")
+    }
+
+    revalidatePath("/admin/users")
+  } catch (error) {
+    console.error("Failed to toggle user status:", error)
+    throw error
+  }
 }

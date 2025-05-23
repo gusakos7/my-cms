@@ -2,8 +2,11 @@
 import { GalleryVerticalEnd } from "lucide-react";
 
 import { LoginForm } from "@/components/login-form";
+import { getSession } from "@/actions";
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  // const session = await getSession();
+  // console.log({ session });
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
